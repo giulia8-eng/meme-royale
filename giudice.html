@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pannello Giudice</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #ff0080, #ff8c00);
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    }
+
+    #frase-box {
+      background: rgba(255,255,255,0.2);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 20px;
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .meme {
+      width: 100%;
+      border-radius: 15px;
+      border: 5px solid transparent;
+      box-shadow: 0 0 20px rgba(255,255,255,0.3);
+      transition: 0.25s;
+      cursor: pointer;
+    }
+
+    .winner {
+      border-color: #00ff88;
+      box-shadow: 0 0 30px #00ff88;
+      transform: scale(1.1);
+    }
+  </style>
+
+</head>
+<body>
+
+  <h1>Pannello Giudice</h1>
+
+  <!-- 🔥 BOX FRASE DEL ROUND -->
+  <div id="frase-box">Premi “Nuovo Round” per generare una frase</div>
+
+  <button onclick="startTimer(60)">⏳ Avvia timer 60s</button>
+  <br>
+  <button onclick="nuovoRound()" style="background:#00ff88; color:black;">🔄 Nuovo Round</button>
+
+  <div id="grid" class="grid"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB03V-a3cKIJk3DufqKK353Y7hEBwb_KaA",
+      authDomain: "meme-royale-100c0.firebaseapp.com",
+      databaseURL: "https://meme-royale-100c0-default-rtdb.firebaseio.com",
+      projectId: "meme-royale-100c0",
+      storageBucket: "meme-royale-100c0.appspot.com",
+      messagingSenderId: "424280204822",
+      appId: "1:424280204822:web:1db163053c0f25754db737"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const grid = document.getElementById("grid");
+    const fraseBox = document.getElementById("frase-box");
+
+    const frasi = [
+      "Quando apri il frigo e non c’è niente",
+      "Quando ti svegli 5 minuti prima della sveglia",
+      "Quando il prof dice 'interrogazione a sorpresa'",
+      "Quando ti cade il telefono dal letto",
+      "Quando ti ricordi un compito all’ultimo secondo",
+      "Quando tua madre entra in camera senza bussare",
+      "Quando il Wi‑Fi smette di funzionare",
+      "Quando ti dicono 'dobbiamo parlare'",
+      "Quando trovi soldi in una vecchia giacca",
+      "Quando il tuo amico fa una figuraccia in pubblico",
+      "Quando il cibo è troppo caldo ma hai fame",
+      "Quando ti chiamano per nome durante l’appello",
+      "Quando il prof ti guarda mentre parli",
+      "Quando ti accorgi che è lunedì",
+      "Quando ti svegli e piove",
+      "Quando il tuo amico dice 'fidati'",
+      "Quando apri un pacco che aspettavi da giorni",
+      "Quando ti cade la pasta per terra",
+      "Quando il cane abbaia senza motivo",
+      "Quando ti dimentichi dove hai messo il telefono",
+      "Quando ti rendi conto che è già sera",
+      "Quando il tuo amico ti manda un vocale di 5 minuti",
+      "Quando ti chiedono 'che fai?' e non stai facendo niente",
+      "Quando ti cade la penna in classe",
+      "Quando il prof ti fa una domanda a caso",
+      "Quando ti rendi conto che hai lasciato il volume al massimo",
+      "Quando il tuo amico ti spoilera una serie",
+      "Quando ti arriva un messaggio che non volevi",
+      "Quando ti chiamano mentre stai mangiando",
+      "Quando ti dimentichi le cuffie a casa",
+      "Quando il tuo amico ti dice 'ho un’idea'",
+      "Quando ti accorgi che hai sbagliato chat",
+      "Quando ti chiedono di fare una foto e non sei fotogenico",
+      "Quando ti cade la pizza a faccia in giù",
+      "Quando il tuo amico ti ruba le patatine",
+      "Quando ti svegli e non sai che giorno è",
+      "Quando ti rendi conto che hai fame di nuovo",
+      "Quando il tuo amico arriva in ritardo",
+      "Quando ti dimentichi la password",
+      "Quando ti cade l’acqua sulla maglietta",
+      "Quando ti chiedono 'sei libero?' e tu già sai",
+      "Quando ti accorgi che il tuo telefono è al 1%",
+      "Quando ti chiamano 'amore' per sbaglio",
+      "Quando il tuo amico fa una battuta pessima",
+      "Quando ti rendi conto che hai lasciato il gas acceso (metaforico)",
+      "Quando ti chiedono di spegnere la musica",
+      "Quando ti accorgi che hai scritto un messaggio imbarazzante",
+      "Quando il tuo amico ti manda un meme perfetto",
+      "Quando ti chiedono 'che hai?' e non lo sai",
+      "Quando ti rendi conto che hai finito la serie",
+      "Quando il tuo amico ti dice 'non ti arrabbiare'",
+      "Quando ti accorgi che è già metà mese",
+      "Quando ti cade la gomma da masticare",
+      "Quando ti chiedono di prestare la penna",
+      "Quando il tuo amico ti guarda e capisci tutto",
+      "Quando ti rendi conto che hai fame alle 2 di notte",
+      "Quando ti chiedono di fare un favore",
+      "Quando ti accorgi che hai dimenticato il portafoglio",
+      "Quando il tuo amico ti dice 'ho una cosa da dirti'",
+      "Quando ti rendi conto che hai sbagliato strada",
+      "Quando ti chiamano mentre sei in bagno",
+      "Quando ti accorgi che hai finito il dentifricio",
+      "Quando il tuo amico ti manda un messaggio alle 3 di notte",
+      "Quando ti rendi conto che è domenica sera",
+      "Quando ti chiedono di alzarti presto",
+      "Quando ti accorgi che hai lasciato il volume al massimo in classe",
+      "Quando il tuo amico ti dice 'non guardare adesso'",
+      "Quando ti rendi conto che hai dimenticato il caricatore",
+      "Quando ti chiedono 'hai studiato?'",
+      "Quando ti accorgi che hai sbagliato numero",
+      "Quando il tuo amico ti manda un video cringe",
+      "Quando ti rendi conto che hai fame subito dopo aver mangiato",
+      "Quando ti chiedono di parlare davanti alla classe",
+      "Quando ti accorgi che hai scritto un messaggio alla persona sbagliata",
+      "Quando il tuo amico ti dice 'non ridere'",
+      "Quando ti rendi conto che hai perso l’autobus",
+      "Quando ti chiedono di fare una foto di gruppo",
+      "Quando ti accorgi che hai dimenticato le chiavi",
+      "Quando il tuo amico ti manda un meme troppo vero",
+      "Quando ti rendi conto che hai lasciato la luce accesa",
+      "Quando ti chiedono 'sei sveglio?'",
+      "Quando ti accorgi che hai sbagliato compito",
+      "Quando il tuo amico ti dice 'non dire a nessuno'",
+      "Quando ti rendi conto che hai finito i soldi",
+      "Quando ti chiedono di fare un discorso",
+      "Quando ti accorgi che hai sbagliato outfit",
+      "Quando il tuo amico ti manda un audio incomprensibile",
+      "Quando ti rendi conto che hai dimenticato l’ombrello",
+      "Quando ti chiedono 'che vuoi mangiare?'",
+      "Quando ti accorgi che hai lasciato il telefono in modalità silenziosa",
+      "Quando il tuo amico ti dice 'ho fatto un casino'",
+      "Quando ti rendi conto che hai sbagliato persona",
+      "Quando ti chiedono di spegnere la musica",
+      "Quando ti accorgi che hai lasciato il volume al massimo",
+      "Quando il tuo amico ti manda un meme che ti descrive perfettamente",
+      "Quando ti rendi conto che hai fame di nuovo",
+      "Quando ti chiedono 'sei sicuro?'",
+      "Quando ti accorgi che hai sbagliato tutto",
+      "Quando il tuo amico ti dice 'non guardare adesso'",
+      "Quando ti rendi conto che è già domani"
+];
+
+    // 🔥 MOSTRA LA FRASE IN TEMPO REALE
+    firebase.database().ref("gioco/frase").on("value", snap => {
+      fraseBox.innerText = snap.val() || "Premi 'Nuovo Round' per generare una frase";
+    });
+
+    // 🔥 MOSTRA I MEME INVIATI
+    firebase.database().ref("scelte").on("value", snap => {
+      const scelte = snap.val();
+      grid.innerHTML = "";
+
+      if (!scelte) return;
+
+      Object.keys(scelte).forEach(id => {
+        const memeNum = scelte[id].meme;
+        const img = document.createElement("img");
+        img.src = "meme/" + memeNum + ".jpeg";
+        img.className = "meme";
+        img.id = "meme-" + id;
+        img.onclick = () => scegliVincitore(id);
+        grid.appendChild(img);
+      });
+    });
+
+    function scegliVincitore(id) {
+      firebase.database().ref("gioco/vincitore").set({ id: id });
+
+      firebase.database().ref("punteggi/" + id).transaction(p => {
+        return (p || 0) + 1;
+      });
+
+
+      document.querySelectorAll(".meme").forEach(m => m.classList.remove("winner"));
+      const winnerImg = document.getElementById("meme-" + id);
+      if (winnerImg) winnerImg.classList.add("winner");
+    }
+
+    function startTimer(seconds) {
+      firebase.database().ref("gioco/timer").set(seconds);
+
+      let interval = setInterval(() => {
+        seconds--;
+        firebase.database().ref("gioco/timer").set(seconds);
+
+        if (seconds <= 0) {
+          clearInterval(interval);
+        }
+      }, 1000);
+    }
+
+    // 🔥 NUOVO ROUND COMPLETO
+    function nuovoRound() {
+      // 1. Genera nuova frase
+      const frase = frasi[Math.floor(Math.random() * frasi.length)];
+      firebase.database().ref("gioco/frase").set(frase);
+
+      // 2. Reset scelte
+      firebase.database().ref("scelte").set(null);
+
+      // 3. Reset vincitore
+      firebase.database().ref("gioco/vincitore").set(null);
+
+      // 4. Reset timer
+      firebase.database().ref("gioco/timer").set(0);
+
+      // 5. Pulisce la griglia
+      grid.innerHTML = "";
+    }
+  </script>
+
+</body>
+</html>
+

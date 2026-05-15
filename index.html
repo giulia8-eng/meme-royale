@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Meme Royale</title>
+
+  <style>
+    /* SFONDO E STRUTTURA */
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #ff0080, #ff8c00);
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    /* ANIMAZIONE DI ENTRATA */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 52px;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+      animation: pop 0.6s ease-out;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    p {
+      font-size: 22px;
+      margin-bottom: 40px;
+      opacity: 0.9;
+    }
+
+    /* PULSANTI MIGLIORATI */
+    .btn {
+      display: block;
+      width: 260px;
+      margin: 15px auto;
+      padding: 15px;
+      background: white;
+      color: #ff0080;
+      font-size: 22px;
+      font-weight: bold;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: 0.25s;
+      box-shadow: 0 0 12px rgba(255,255,255,0.4);
+    }
+
+    .btn:hover {
+      transform: scale(1.1);
+      background: #ffe6f7;
+      box-shadow: 0 0 18px rgba(255,255,255,0.7);
+    }
+
+    /* VERSIONE PER TELEFONO */
+    @media (max-width: 600px) {
+      body {
+        padding-top: 30px;
+      }
+
+      h1 {
+        font-size: 38px;
+      }
+
+      p {
+        font-size: 16px;
+        margin-bottom: 25px;
+      }
+
+      .btn {
+        width: 200px;
+        font-size: 18px;
+        padding: 12px;
+      }
+    }
+  </style>
+
+</head>
+<body>
+
+  <h1>Meme Royale</h1>
+  <p>Il gioco dei meme più epico della serata</p>
+
+  <a class="btn" href="gioca.html">🎮 Entra nel gioco</a>
+  <a class="btn" href="schermo.html">📺 Schermo principale</a>
+  <a class="btn" href="giudice.html">👑 Pannello giudice</a>
+
+</body>
+</html>

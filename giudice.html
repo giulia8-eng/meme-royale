@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giudice - Meme Royale</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 20px; }
+        #frase-round { font-size: 22px; margin: 20px 0; font-weight: bold; }
+        button {
+            padding: 12px 20px;
+            font-size: 18px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Frase del Round</h1>
+    <div id="frase-round">Premi per generare una frase</div>
+
+    <button onclick="generaFrase()">Nuovo Round</button>
+
+    <script>
+        const frasi = [
+            "Quando ti svegli 5 minuti prima della sveglia",
+            "Quando il prof dice 'interrogazione a sorpresa'",
+            "Quando apri il frigo e non c’è niente",
+            "Quando ti cade il telefono dal letto",
+            "Quando ti ricordi un compito all’ultimo secondo"
+        ];
+
+        function generaFrase() {
+            const frase = frasi[Math.floor(Math.random() * frasi.length)];
+            document.getElementById("frase-round").innerText = frase;
+
+            // 🔥 Salva la frase per la squadra
+            localStorage.setItem("frase_corrente", frase);
+        }
+
+        // Se ricarichi la pagina, mostra l’ultima frase
+        const salvata = localStorage.getItem("frase_corrente");
+        if (salvata) {
+            document.getElementById("frase-round").innerText = salvata;
+        }
+    </script>
+
+</body>
+</html>
